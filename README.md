@@ -1,4 +1,4 @@
-# Food NLP Search Backend
+# Food NLP Search Lite Backend
 
 A production-ready Node.js + Express backend for typo-tolerant, full-text, and fuzzy food search using PostgreSQL and Redis.
 
