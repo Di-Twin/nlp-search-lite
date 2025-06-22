@@ -1,18 +1,25 @@
 #!/usr/bin/env bash
 
-# Add GitHub token for private package access
+# Setup GitHub authentication via HTTPS with token
 echo "//github.com/:_authToken=$GITHUB_TOKEN" > ~/.npmrc
 echo "always-auth=true" >> ~/.npmrc
 
-# Rewrite SSH to HTTPS for any Git operations
-git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
-git config --global url."https://github.com/".insteadOf "git@github.com:"
+# Force git to use HTTPS+token instead of SSH
+git config --global url."https://$GITHUB_TOKEN@github.com/".insteadOf "git@github.com:"
+git config --global url."https://$GITHUB_TOKEN@github.com/".insteadOf "ssh://git@github.com/"
 
-# Remove old SSH cache
-rm -f ~/.ssh/known_hosts
+# Remove old lock file and node_modules
+rm -rf node_modules package-lock.json
 
-# Install dependencies
-npm install
+# Install dependencies with the new configuration
+# Use --no-save flag to avoid modifying package.json
+npm install --no-package-lock
 
-# (Optional) Update from git source
-npm run update-config
+# Generate a clean package-lock.json with HTTPS URLs
+npm install --package-lock-only
+
+# Now install everything from the clean package-lock.json
+npm ci
+
+# Run your update scripts (optional, as npm ci should install everything correctly)
+# npm run update-all
